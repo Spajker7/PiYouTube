@@ -29,7 +29,8 @@ To get Chromium and suitable ChromeDriver on Raspbian, follow these instructions
     ```
     wget -O chromium.deb http://http.us.debian.org/debian/pool/main/c/chromium-browser/chromium-driver_61.0.3163.100-1~deb9u1_armhf.deb && sudo dpkg -i chromium.deb
     ```
-
+   For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
+   
 Now you can grab a pre-built jar from this repository or build one by yourself from source. 
 
 Run the jar with ``` sudo java -jar piyoutube.jar ```
