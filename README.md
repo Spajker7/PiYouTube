@@ -7,27 +7,21 @@ Once you run the program, the YouTube app on your smartphone will be able to see
 # Installation
 This project requires Java 1.8, Chrome(Chromium) and ChromeDriver.
 
-To get Chromium and suitable ChromeDriver on Raspbian, follow these instructions:
-1) Make sure you are running Raspbian Stretch
-2) Make sure you have Chrome(Chromium) > 59.
+This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian:
+1) Add ```deb http://security.debian.org/debian-security stretch/updates main``` to ```/etc/apt/sources.list```
+    ```
+    sudo nano /etc/apt/sources.list
+    ```
+2) Refresh package lists
+    ```
+    sudo apt-get update && sudo apt-get upgrade
+    ```
+    
+3) Remove any previous installations of chromium/chrome.
+4) Install chromium and chromedriver
     ```
     sudo apt-get install chromium
-    ```
-3) Get suitable chromedriver.
-    For Raspbian do the following:
-    ```
-    sudo apt-get install libminizip1
-    sudo apt-get install libwebpmux2
-    ```
-    
-    If running Raspbian Lite ( without GUI, also run this)
-    ``` 
-    sudo apt-get install libgtk-3-0 
-    ```
-    
-    Then run this. chromedriver should be installed under ```/usr/bin/```
-    ```
-    wget -O chromium.deb http://http.us.debian.org/debian/pool/main/c/chromium-browser/chromium-driver_61.0.3163.100-1~deb9u1_armhf.deb && sudo dpkg -i chromium.deb
+    sudo apt-get install chromedriver
     ```
    For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
    
