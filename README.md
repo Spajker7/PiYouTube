@@ -1,5 +1,8 @@
 # PiYouTube
-DIAL YouTube player ( acts as network smart TV ). Intended for Raspberry Pi, but can be run on any device supporting Chrome and ChromeDriver.
+DIAL YouTube player ( acts as a smart TV on your network ). Intended for Raspberry Pi, but can be run on any device supporting Chrome and ChromeDriver.
+
+#### Wait, what?
+Once you run the program, the YouTube app on your smartphone will be able to see your device and will allow you to play and control the playback of YouTube videos on that device, from your smarthphone, without any third-party apps installed on the smartphone itself.
 
 # Installation
 This project requires Java 1.8, Chrome(Chromium) and ChromeDriver.
@@ -26,7 +29,8 @@ To get Chromium and suitable ChromeDriver on Raspbian, follow these instructions
     ```
     wget -O chromium.deb http://http.us.debian.org/debian/pool/main/c/chromium-browser/chromium-driver_61.0.3163.100-1~deb9u1_armhf.deb && sudo dpkg -i chromium.deb
     ```
-
+   For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
+   
 Now you can grab a pre-built jar from this repository or build one by yourself from source. 
 
 Run the jar with ``` sudo java -jar piyoutube.jar ```
