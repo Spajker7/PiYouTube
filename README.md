@@ -36,11 +36,12 @@ Now you can grab a pre-built jar from this repository or build one by yourself f
 Run the jar with ``` sudo java -jar piyoutube.jar ```
 
 If running for the first time, the program will exit. Simply edit out the newly generated ```config.json``` and put chromedriver's location under ```driver```.
+**For Linux, you must also define a network interface.**
 
 Example for a Raspberry Pi:
 ```
 {
-    "iface": "all",
+    "iface": "wlan0",
     "chromeParams": [
         "--headless",
         "--disable-gpu"
