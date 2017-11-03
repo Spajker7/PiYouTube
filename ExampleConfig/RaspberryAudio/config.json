@@ -1,0 +1,10 @@
+{
+    "chromeParams": [
+        "--headless"
+    ],
+    "driver": "/usr/bin/chromedriver",
+    "preloadchrome": true,
+    "iface": "wlan0",
+    "chrome": "auto",
+    "name": "PiYouTube Player"
+}

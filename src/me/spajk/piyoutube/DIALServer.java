@@ -164,6 +164,11 @@ public class DIALServer implements HttpHandler
 					
 					String url = "https://www.youtube.com/tv?" + body;
 					
+					if(this.piy.getChromeDriver() == null)
+					{
+						this.piy.launchChromeDriver();
+					}
+					
 			        this.piy.getChromeDriver().get(url);
 					
 			        this.youtubeState = State.RUNNING;
@@ -172,7 +177,15 @@ public class DIALServer implements HttpHandler
 				{
 					if(command.equals("run"))
 					{
-						this.piy.getChromeDriver().get("");
+						if(this.piy.getConfig().optBoolean("preloadchrome"))
+						{
+							this.piy.getChromeDriver().get(""); // TODO This doesn't close the tab
+						}
+						else
+						{
+							this.piy.stopChromeDriver();
+						}
+						
 						this.youtubeState = State.STOPPED;
 						t.sendResponseHeaders(200, 0);
 					}

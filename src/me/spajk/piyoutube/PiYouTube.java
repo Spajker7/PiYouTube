@@ -14,7 +14,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import com.google.common.collect.ImmutableMap;
 
 public class PiYouTube
 {
@@ -52,11 +55,7 @@ public class PiYouTube
 	 */
 	
 	private UUID deviceUUID;
-	private String driverLocation;
-	private String chromeLocation;
-	private String networkInterface;
-	private ChromeOptions chromeParams;
-	private String deviceName;
+	private JSONObject config;
 	
 	private DIALServer dialServer;
 	private ArrayList<SSDPServer> ssdpServers;
@@ -77,16 +76,19 @@ public class PiYouTube
 		
 		this.loadConfig(configFile);
 		
-		System.out.println("Starting Chrome...");
-		this.launchChromeDriver();
-		System.out.println("Chrome started!");
+		if(this.config.optBoolean("preloadchrome") == true)
+		{
+			System.out.println("Starting Chrome...");
+			this.launchChromeDriver();
+			System.out.println("Chrome started!");
+		}
 
 		try
 		{
 			this.ssdpServers = new ArrayList<SSDPServer>();
 			NetworkInterface iface = null;
 			
-			if(this.networkInterface != null && (iface = NetworkInterface.getByName(this.networkInterface)) != null)
+			if(this.config.optString("iface", null) != null && (iface = NetworkInterface.getByName(this.config.getString("iface"))) != null)
 			{
 				this.ssdpServers.add(new SSDPServer(this.deviceUUID, iface, DIAL_PORT));
 			}
@@ -121,22 +123,41 @@ public class PiYouTube
 		}
 	}
 
-	private void launchChromeDriver()
+	public void launchChromeDriver()
 	{
-		System.setProperty("webdriver.chrome.driver", this.driverLocation);
+		System.setProperty("webdriver.chrome.driver", this.config.getString("driver"));
 		
-		if(this.chromeLocation != null)
+		ChromeOptions chromeParams = new ChromeOptions();
+		
+		JSONArray options = this.config.getJSONArray("chromeParams");
+		if(options != null)
 		{
-			this.chromeParams.setBinary("/usr/bin/chromium-browser");
+			for(int i = 0; i < options.length(); i++)
+			{
+				chromeParams.addArguments(options.getString(i));
+			}
+		}
+		
+		if(this.config.optString("chrome", null) != null)
+		{
+			chromeParams.setBinary(this.config.getString("chrome"));
 		}
 		
 		try
 		{
-			this.chromeDriver = new ChromeDriver(chromeParams);
+			if(! Util.isUnix())
+			{
+				this.chromeDriver = new ChromeDriver(chromeParams);
+			}
+			else
+			{
+				this.chromeDriver = new ChromeDriver(new ChromeDriverService.Builder().withEnvironment(ImmutableMap.of("DISPLAY",":0.0")).build(), chromeParams);
+			}
 		}
 		catch(Exception e)
 		{
 			System.out.println("Error loading chromedriver. Are you sure the correct path is set in config.json?");
+			e.printStackTrace();
 			System.exit(0);
 		}
 	}
@@ -193,66 +214,7 @@ public class PiYouTube
 	
 	public String getDeviceName()
 	{
-		return this.deviceName;
-	}
-	
-	private JSONObject getDefaultConfig()
-	{
-		JSONObject config = new JSONObject();
-		
-		config.put("driver", "");
-		config.put("name", Util.getDefaultDeviceName());
-		config.put("chrome", "auto");
-		config.put("iface", "all");
-		
-		JSONArray chromeParams = new JSONArray();
-		chromeParams.put("--headless");
-		chromeParams.put("--disable-gpu");
-		
-		config.put("chromeParams", chromeParams);
-		
-		return config;
-	}
-	
-	private void loadConfig(JSONObject jsonConfig)
-	{
-		this.driverLocation = Util.getJSONFieldStringOrNull(jsonConfig, "driver");
-		this.chromeLocation = Util.getJSONFieldStringOrNull(jsonConfig, "chrome");
-		this.networkInterface = Util.getJSONFieldStringOrNull(jsonConfig, "iface");
-		this.deviceName = Util.getJSONFieldStringOrNull(jsonConfig, "name");
-		
-		if(this.deviceName == null)
-		{
-			this.deviceName = Util.getDefaultDeviceName();
-		}
-		
-		if("auto".equals(chromeLocation))
-		{
-			this.chromeLocation = null;
-		}
-		
-		if("all".equals(networkInterface))
-		{
-			this.networkInterface = null;
-		}
-		
-		if(this.networkInterface == null && Util.isUnix())
-		{
-			System.out.println("Interface needs to be defined for Linux systems. Please edit config.json.");
-			System.exit(0);
-		}
-		
-		this.chromeParams = new ChromeOptions();
-		
-		JSONArray options = jsonConfig.getJSONArray("chromeParams");
-		
-		if(options != null)
-		{
-			for(int i = 0; i < options.length(); i++)
-			{
-				this.chromeParams.addArguments(options.getString(i));
-			}
-		}
+		return this.config.optString("name");
 	}
 	
 	private void loadConfig(File configFile)
@@ -263,21 +225,20 @@ public class PiYouTube
 			String configStr = Util.readWholeInputStream(input);
 			input.close();
 			
-			this.loadConfig(new JSONObject(configStr));
+			this.config = Option.fillOptions(new JSONObject(configStr));
 			
 			System.out.println("Config loaded.");
 		}
 		catch (FileNotFoundException e)
 		{
-			JSONObject defaulConfig = this.getDefaultConfig();
-			this.loadConfig(defaulConfig);
+			this.config = Option.fillOptions(new JSONObject());
 			
 			System.out.println("Loading default config. Writing it to disk.");
 			
 			try
 			{
 				FileOutputStream output = new FileOutputStream(configFile);
-				output.write(defaulConfig.toString(4).getBytes());
+				output.write(this.config.toString(4).getBytes());
 				output.close();
 				
 			}
@@ -286,9 +247,9 @@ public class PiYouTube
 				System.out.println("Error writing default config to disk.");
 			}
 		}
-		catch (IOException e)
+		catch (JSONException | IOException e)
 		{
-			this.loadConfig(this.getDefaultConfig());
+			this.config = Option.fillOptions(new JSONObject());
 			System.out.println("Error while reading config, using default config.");
 		}
 	}
@@ -307,8 +268,22 @@ public class PiYouTube
 		return this.deviceUUID;
 	}
 	
+	public JSONObject getConfig()
+	{
+		return this.config;
+	}
+	
 	public ChromeDriver getChromeDriver()
 	{
 		return this.chromeDriver;
+	}
+
+	public void stopChromeDriver()
+	{
+		if(this.chromeDriver != null)
+		{
+			this.chromeDriver.quit();
+			this.chromeDriver = null;
+		}
 	}
 }

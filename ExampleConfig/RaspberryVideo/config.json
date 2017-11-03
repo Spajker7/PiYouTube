@@ -1,0 +1,13 @@
+{
+    "chromeParams": [
+        "--fullscreen",
+        "--kiosk",
+        "--disable-infobars",
+		"--no-sandbox"
+    ],
+    "driver": "/usr/bin/chromedriver",
+    "preloadchrome": false,
+    "iface": "wlan0",
+    "chrome": "auto",
+    "name": "PiYouTube Player"
+}
