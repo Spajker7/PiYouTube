@@ -94,6 +94,12 @@ public class PiYouTube
 			}
 			else
 			{
+				if(Util.isUnix())
+				{
+					System.out.println("Interface needs to be defined for Linux systems. Please edit config.json.");
+					System.exit(0);
+				}
+				
 				for(NetworkInterface iface2 : Collections.list(NetworkInterface.getNetworkInterfaces()))
 				{
 					if(iface2.isUp())
@@ -238,7 +244,7 @@ public class PiYouTube
 			try
 			{
 				FileOutputStream output = new FileOutputStream(configFile);
-				output.write(this.config.toString(4).getBytes());
+				output.write(Option.getDefaultOptions().toString(4).getBytes());
 				output.close();
 				
 			}

@@ -51,17 +51,16 @@ public class Option
 	{
 		if("iface".equals(name) && "all".equals(value))
 		{
-			if(Util.isUnix())
-			{
-				System.out.println("Interface needs to be defined for Linux systems. Please edit config.json.");
-				System.exit(0);
-			}
-			
 			value = null;
 		}
 		else if("chrome".equals(name) && "auto".equals(value))
 		{
 			value = null;
+		}
+		
+		if(value == null)
+		{
+			value = JSONObject.NULL;
 		}
 		
 		return value;
