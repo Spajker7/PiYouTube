@@ -13,7 +13,11 @@ public class ShutdownHook extends Thread
 	{
 		if(this.piy.getChromeDriver() != null)
 		{
-			this.piy.getChromeDriver().quit();
+			try
+			{
+				this.piy.getChromeDriver().quit();
+			}
+			catch(Exception e) {}
 		}
 		
 		if(this.piy.getDialServer() != null)

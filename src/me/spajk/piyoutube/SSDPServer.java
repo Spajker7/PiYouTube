@@ -54,7 +54,18 @@ public class SSDPServer extends Thread
 			
 			if(ifaceAddress != null)
 			{
+				/*
+				 * Java doesn't
+				 */
+				
 				MulticastSocket serverSocket = new MulticastSocket(new InetSocketAddress(ifaceAddress, 1900));
+				
+				if(Util.isUnix())
+				{
+					serverSocket.close();
+					serverSocket = new MulticastSocket(1900); // TODO receive won't work if address isn't 0.0.0.0
+				}
+				
 				serverSocket.joinGroup(InetAddress.getByName("239.255.255.250"));
 				
 				byte receiveData[] = new byte[4096];
@@ -109,6 +120,11 @@ public class SSDPServer extends Thread
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public NetworkInterface getNetworkInterface()
+	{
+		return this.iface;
 	}
 	
 	public void stopServer()

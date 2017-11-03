@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -191,18 +190,6 @@ public class PiYouTube
 		return uuid;
 	}
 	
-	private String getDefaultDeviceName()
-	{
-		try
-		{
-			return InetAddress.getLocalHost().getHostName();
-		}
-		catch(Exception e) 
-		{ 
-			return "PiYouTubePlayer";
-		}
-	}
-
 	
 	public String getDeviceName()
 	{
@@ -214,7 +201,7 @@ public class PiYouTube
 		JSONObject config = new JSONObject();
 		
 		config.put("driver", "");
-		config.put("name", this.getDefaultDeviceName());
+		config.put("name", Util.getDefaultDeviceName());
 		config.put("chrome", "auto");
 		config.put("iface", "all");
 		
@@ -236,7 +223,7 @@ public class PiYouTube
 		
 		if(this.deviceName == null)
 		{
-			this.deviceName = this.getDefaultDeviceName();
+			this.deviceName = Util.getDefaultDeviceName();
 		}
 		
 		if("auto".equals(chromeLocation))
@@ -246,7 +233,13 @@ public class PiYouTube
 		
 		if("all".equals(networkInterface))
 		{
-			this.chromeLocation = null;
+			this.networkInterface = null;
+		}
+		
+		if(this.networkInterface == null && Util.isUnix())
+		{
+			System.out.println("Interface needs to be defined for Linux systems. Please edit config.json.");
+			System.exit(0);
 		}
 		
 		this.chromeParams = new ChromeOptions();

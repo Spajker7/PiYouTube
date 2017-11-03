@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,6 +51,23 @@ public class Util
 		catch(JSONException e)
 		{
 			return null;
+		}
+	}
+	
+	public static boolean isUnix() {
+		String os = System.getProperty("os.name");
+        return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 );
+    }
+	
+	public static String getDefaultDeviceName()
+	{
+		try
+		{
+			return InetAddress.getLocalHost().getHostName();
+		}
+		catch(Exception e) 
+		{ 
+			return "PiYouTubePlayer";
 		}
 	}
 }
