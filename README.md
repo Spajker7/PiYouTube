@@ -7,7 +7,7 @@ Once you run the program, the YouTube app on your smartphone will be able to see
 # Installation
 This project requires Java 1.8, Chrome(Chromium) and ChromeDriver.
 
-This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian:
+This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian **Stretch**:
 1) Add ```deb http://security.debian.org/debian-security stretch/updates main``` to ```/etc/apt/sources.list```
     ```
     sudo nano /etc/apt/sources.list
@@ -21,13 +21,13 @@ This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian:
 4) Install chromium and chromedriver
     ```
     sudo apt-get install chromium
-    sudo apt-get install chromedriver
+    sudo apt-get install chromium-driver
     ```
    For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
    
-Now you can grab a pre-built jar from this repository or build one by yourself from source. 
-
-Run the jar with ``` sudo java -jar piyoutube.jar ```
+Now you can clone this repository by doing 
+```git clone https://github.com/Spajker7/PiYouTube/```
+After this you can just do ```./run_rpi_video.sh``` or ```./run_rpi_audio.sh```
 
 If running for the first time, the program will exit. Simply edit out the newly generated ```config.json``` and put chromedriver's location under ```driver```.
 **For Linux, you must also define a network interface.**
