@@ -26,7 +26,9 @@ This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian **
    For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
    
 Now you can clone this repository by doing 
+
 ```git clone https://github.com/Spajker7/PiYouTube/```
+
 After this you can just do ```./run_rpi_video.sh``` or ```./run_rpi_audio.sh```
 
 If running for the first time, the program will exit. Simply edit out the newly generated ```config.json``` and put chromedriver's location under ```driver```.
