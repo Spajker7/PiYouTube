@@ -1,50 +1,43 @@
 # PiYouTube
-DIAL YouTube player ( acts as a smart TV on your network ). Intended for Raspberry Pi, but can be run on any device supporting Chrome and ChromeDriver.
+DIAL YouTube player ( acts as a smart TV on your network ). Intended for Raspberry Pi, but can be run on any device.
 
 #### Wait, what?
 Once you run the program, the YouTube app on your smartphone will be able to see your device and will allow you to play and control the playback of YouTube videos on that device, from your smartphone, without any third-party apps installed on the smartphone itself.
 
 # Installation
-This project requires Java 1.8, Chrome(Chromium) and ChromeDriver.
-
-This is the fastest way to get Chromium and suitable ChromeDriver on Raspbian **Stretch**:
-1) Add ```deb http://security.debian.org/debian-security stretch/updates main``` to ```/etc/apt/sources.list```
-    ```
-    sudo nano /etc/apt/sources.list
-    ```
-2) Refresh package lists
-    ```
-    sudo apt-get update && sudo apt-get upgrade
-    ```
-    
-3) Remove any previous installations of chromium/chrome.
-4) Install chromium and chromedriver
-    ```
-    sudo apt-get install chromium
-    sudo apt-get install chromium-driver
-    ```
-   For other systems, check this [link](https://sites.google.com/a/chromium.org/chromedriver/downloads).
+This project requires Java 1.8 and any web browser.
    
-Now you can clone this repository by doing 
+You can grab an already compiled JAR file from the [Releases](https://github.com/Spajker7/PiYouTube/releases) page.
 
-```git clone https://github.com/Spajker7/PiYouTube/```
+To run it, simply do ```java -jar piyoutube.jar```
 
-After this you can just do ```./run_rpi_video.sh``` or ```./run_rpi_audio.sh```
+If running for the first time, the program will exit. Simply edit out the newly generated ```config.json``` and set the appropriate config.
 
-If running for the first time, the program will exit. Simply edit out the newly generated ```config.json``` and put chromedriver's location under ```driver```.
-**For Linux, you must also define a network interface.**
+# Configuration
 
-Example for a Raspberry Pi:
+```config.json``` file contains the program configuration. Running the program will generate an empty config file.
+These are the available configuration options:
+* ```iface``` - Specifies which network interface to use
+* ```name``` - Specifies device name
+* ```command``` Specifies which command to run to open the web-browser. ```{url}``` will be replaced by a youtube link.
+
+**For Linux, you must define a specific network interface. ( wlan0 for wifi or eth0 for ethernet)**
+
+Example config for a Raspberry Pi:
 ```
 {
     "iface": "wlan0",
-    "chromeParams": [
-        "--headless",
-        "--disable-gpu"
-    ],
-    "driver": "/usr/bin/chromedriver",
-    "chrome": "auto",
-    "name": "PiYouTube Player"
+    "name": "PiYouTube Player",
+    "command": "chromium-browser --new-window --kiosk --fullscreen {url}"
+}
+```
+
+Example config for Windows:
+```
+{
+    "iface": "all",
+    "name": "YouTube Player",
+    "command": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe --new-window --kiosk --fullscreen {url}"
 }
 ```
 
