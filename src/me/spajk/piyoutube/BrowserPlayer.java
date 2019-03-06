@@ -34,6 +34,6 @@ public class BrowserPlayer extends Player
 	@Override
 	public void stopPlayer()
 	{
-		this.browserProcess.destroyForcibly();
+		this.browserProcess.destroy();
 	}
 }

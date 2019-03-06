@@ -70,6 +70,12 @@ public class PiYouTube
 		
 		this.loadConfig(configFile);
 
+		if(this.config.getString("command") == null || this.config.getString("command").equals(""))
+		{
+			System.out.println("Browser startup command not defined. Please edit config.json.");
+			return;
+		}
+
 		this.player = new BrowserPlayer(this.config);
 
 		try
@@ -86,7 +92,7 @@ public class PiYouTube
 				if(Util.isUnix())
 				{
 					System.out.println("Interface needs to be defined for Linux systems. Please edit config.json.");
-					System.exit(0);
+					return;
 				}
 				
 				for(NetworkInterface iface2 : Collections.list(NetworkInterface.getNetworkInterfaces()))
@@ -122,47 +128,6 @@ public class PiYouTube
 	{
 		return this.player;
 	}
-
-	/*
-	public void launchChromeDriver()
-	{
-		System.setProperty("webdriver.chrome.driver", this.config.getString("driver"));
-		
-		ChromeOptions chromeParams = new ChromeOptions();
-		
-		JSONArray options = this.config.getJSONArray("chromeParams");
-		if(options != null)
-		{
-			for(int i = 0; i < options.length(); i++)
-			{
-				chromeParams.addArguments(options.getString(i));
-			}
-		}
-		
-		if(this.config.optString("chrome", null) != null)
-		{
-			chromeParams.setBinary(this.config.getString("chrome"));
-		}
-		
-		try
-		{
-			if(! Util.isUnix())
-			{
-				this.chromeDriver = new ChromeDriver(chromeParams);
-			}
-			else
-			{
-				this.chromeDriver = new ChromeDriver(new ChromeDriverService.Builder().withEnvironment(ImmutableMap.of("DISPLAY",":0.0")).build(), chromeParams);
-			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("Error loading chromedriver. Are you sure the correct path is set in config.json?");
-			e.printStackTrace();
-			System.exit(0);
-		}
-	}
-	*/
 	
 	private UUID getThisDeviceUUID(File uuidFile)
 	{
