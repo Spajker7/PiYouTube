@@ -38,11 +38,6 @@
       <groupId>com.sun.net.httpserver</groupId>
       <artifactId>http</artifactId>
       <version>20070405</version>
-    </dependency> 
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-chrome-driver</artifactId>
-      <version>3.6.0</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>

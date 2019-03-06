@@ -10,14 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.google.common.collect.ImmutableMap;
 
 public class PiYouTube
 {
@@ -59,8 +53,8 @@ public class PiYouTube
 	
 	private DIALServer dialServer;
 	private ArrayList<SSDPServer> ssdpServers;
-	
-	private ChromeDriver chromeDriver;
+
+	private Player player;
 	
 	public void run(String[] args)
 	{
@@ -75,13 +69,8 @@ public class PiYouTube
 		System.out.println("Loaded device UUID. UUID: " + this.deviceUUID);
 		
 		this.loadConfig(configFile);
-		
-		if(this.config.optBoolean("preloadchrome") == true)
-		{
-			System.out.println("Starting Chrome...");
-			this.launchChromeDriver();
-			System.out.println("Chrome started!");
-		}
+
+		this.player = new BrowserPlayer(this.config);
 
 		try
 		{
@@ -129,6 +118,12 @@ public class PiYouTube
 		}
 	}
 
+	public Player getPlayer()
+	{
+		return this.player;
+	}
+
+	/*
 	public void launchChromeDriver()
 	{
 		System.setProperty("webdriver.chrome.driver", this.config.getString("driver"));
@@ -167,6 +162,7 @@ public class PiYouTube
 			System.exit(0);
 		}
 	}
+	*/
 	
 	private UUID getThisDeviceUUID(File uuidFile)
 	{
@@ -277,19 +273,5 @@ public class PiYouTube
 	public JSONObject getConfig()
 	{
 		return this.config;
-	}
-	
-	public ChromeDriver getChromeDriver()
-	{
-		return this.chromeDriver;
-	}
-
-	public void stopChromeDriver()
-	{
-		if(this.chromeDriver != null)
-		{
-			this.chromeDriver.quit();
-			this.chromeDriver = null;
-		}
 	}
 }

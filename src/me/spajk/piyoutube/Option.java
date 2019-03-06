@@ -1,6 +1,5 @@
 package me.spajk.piyoutube;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Option
@@ -8,10 +7,7 @@ public class Option
 	public static Option[] defaultOptionsArray = {
 		new Option("name", Util.getDefaultDeviceName(), "Name of your device"),
 		new Option("iface", "all", "Network interface from which connections are expected"),
-		new Option("driver", "", "Path to ChromeDriver"),
-		new Option("chrome", "auto", "Custom path to Chrome binary"),
-		new Option("preloadchrome", false, "Should Chrome be always on"),
-		new Option("chromeParams", new JSONArray("[\"--fullscreen\", \"--kiosk\",\"--disable-infobars\",\"--no-sandbox\"]"), "Should Chrome be always on")
+		new Option("command", "", "Command to execute to open browser"),
 	};
 	
 	public static JSONObject getDefaultOptions()

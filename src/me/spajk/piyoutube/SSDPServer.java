@@ -15,26 +15,17 @@ public class SSDPServer extends Thread
 	private boolean shouldStop = false;
 	
 	private UUID deviceUUID;
-	private int wakeUpTimeout;
-	private boolean wakeOnWifiLan;
 	private int dialPort;
 	
 	private NetworkInterface iface;
 	
-	public SSDPServer(UUID deviceUUID, int wakeUpTimeout, boolean wakeOnWifiLan, NetworkInterface iface, int dialPort)
+	public SSDPServer(UUID deviceUUID, NetworkInterface iface, int dialPort)
 	{
 		this.deviceUUID = deviceUUID;
-		this.wakeOnWifiLan = wakeOnWifiLan;
-		this.wakeUpTimeout = wakeUpTimeout;
 		this.dialPort = dialPort;
 		this.iface = iface;
 		
 		this.setName("SSDP Server - " + iface.getName());
-	}
-	
-	public SSDPServer(UUID deviceUUID, NetworkInterface iface, int dialPort)
-	{
-		this(deviceUUID, 10, true, iface, dialPort);
 	}
 
 	public void run()
@@ -54,10 +45,6 @@ public class SSDPServer extends Thread
 			
 			if(ifaceAddress != null)
 			{
-				/*
-				 * Java doesn't
-				 */
-				
 				MulticastSocket serverSocket = new MulticastSocket(new InetSocketAddress(ifaceAddress, 1900));
 				
 				if(Util.isUnix())
@@ -83,13 +70,6 @@ public class SSDPServer extends Thread
 						// https://github.com/Netflix/dial-reference/blob/master/server/quick_ssdp.c#L199
 						if(ssdpMessage.contains("urn:dial-multiscreen-org:service:dial:1"))
 						{
-							String wake = "";
-							
-							if(-1 < this.wakeUpTimeout && this.wakeOnWifiLan)
-							{
-								wake = "WAKEUP: MAC=" + Util.macAddressToString(this.iface.getHardwareAddress()) + ";Timeout=" + this.wakeUpTimeout + "\r\n";
-							}
-							
 							String ssdp_reply = "HTTP/1.1 200 OK\r\n" +
 									"LOCATION: http://" + ifaceAddress.getHostAddress() + ":" + this.dialPort + "/dd.xml\r\n" +
 									"CACHE-CONTROL: max-age=1800\r\n" +
@@ -99,7 +79,6 @@ public class SSDPServer extends Thread
 									"ST: urn:dial-multiscreen-org:service:dial:1\r\n" +
 									"USN: uuid:" + this.deviceUUID.toString()  + "::" +
 									"urn:dial-multiscreen-org:service:dial:1\r\n" +
-									wake +
 									"\r\n";
 							
 							byte message[] = ssdp_reply.getBytes(StandardCharsets.US_ASCII);

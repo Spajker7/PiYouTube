@@ -3,6 +3,7 @@ package me.spajk.piyoutube;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class DIALServer implements HttpHandler
 	
 	private State youtubeState;
 	private boolean youtubeAllowStop;
-	
+
 	private HashMap<String, String> youtubeData = new HashMap<String, String>();
 	
 	private PiYouTube piy;
@@ -118,77 +119,65 @@ public class DIALServer implements HttpHandler
 			if(appname.equals("YouTube"))
 			{
 				System.out.println("YouTube METHOD: " + method + " COMMAND: " + command);
-				
-				if(method.equals("GET"))
+
+				switch (method)
 				{
-					t.getResponseHeaders().add("Content-Type", "text/xml");
-					t.sendResponseHeaders(200, 0);
-					
-					String response = 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
-					
-					response += "<service xmlns=\"urn:dial-multiscreen-org:schemas:dial\">\r\n";
-					response += "  <name>YouTube</name>\r\n";
-					response += "  <options allowStop=\"" + youtubeAllowStop + "\"/>\r\n";
-					response += "  <state>" + this.youtubeState.toString() + "</state>\r\n";
-					
-					if(! this.youtubeData.isEmpty())
-					{
-						response += "  <additionalData xmlns=\"http://www.youtube.com/dial\">\r\n";
-						
-						for(Map.Entry<String, String> entry : this.youtubeData.entrySet())
-						{
-							response += "    <" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">\r\n";
-						}
-						
-						response += "  </additionalData>\r\n";
-					}
-					
-					response += "</service>";
-					
-					OutputStream os = t.getResponseBody();
-					
-					os.write(response.getBytes(StandardCharsets.US_ASCII));
-					os.close();
-				}
-				else if(method.equals("POST"))
-				{
-					String body = Util.readWholeInputStream(t.getRequestBody());
-					t.getResponseHeaders().add("Content-Type", "text/plain");
-					t.getResponseHeaders().add("Location", "http://" + t.getLocalAddress().getAddress().getHostAddress() + ":" + this.port + "/apps/YouTube/run");
-					
-					t.sendResponseHeaders(201, 0);
-					
-					t.getResponseBody().close();
-					
-					body = java.net.URLDecoder.decode(body, "UTF-8");
-					
-					String url = "https://www.youtube.com/tv?" + body;
-					
-					if(this.piy.getChromeDriver() == null)
-					{
-						this.piy.launchChromeDriver();
-					}
-					
-			        this.piy.getChromeDriver().get(url);
-					
-			        this.youtubeState = State.RUNNING;
-				}
-				else if(method.equals("DELETE"))
-				{
-					if(command.equals("run"))
-					{
-						if(this.piy.getConfig().optBoolean("preloadchrome"))
-						{
-							this.piy.getChromeDriver().get(""); // TODO This doesn't close the tab
-						}
-						else
-						{
-							this.piy.stopChromeDriver();
-						}
-						
-						this.youtubeState = State.STOPPED;
+					case "GET":
+						t.getResponseHeaders().add("Content-Type", "text/xml");
 						t.sendResponseHeaders(200, 0);
-					}
+
+						StringBuilder stringBuilder = new StringBuilder();
+
+						stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+
+						stringBuilder.append("<service xmlns=\"urn:dial-multiscreen-org:schemas:dial\">\r\n");
+						stringBuilder.append("  <name>YouTube</name>\r\n");
+						stringBuilder.append("  <options allowStop=\"").append(youtubeAllowStop).append("\"/>\r\n");
+						stringBuilder.append("  <state>").append(this.youtubeState.toString()).append("</state>\r\n");
+
+						if (!this.youtubeData.isEmpty())
+						{
+							stringBuilder.append("  <additionalData xmlns=\"http://www.youtube.com/dial\">\r\n");
+
+							for (Map.Entry<String, String> entry : this.youtubeData.entrySet())
+							{
+								stringBuilder.append("    <").append(entry.getKey()).append(">").append(entry.getValue()).append("</").append(entry.getKey()).append(">\r\n");
+							}
+
+							stringBuilder.append("  </additionalData>\r\n");
+						}
+
+						stringBuilder.append("</service>");
+
+						OutputStream os = t.getResponseBody();
+
+						os.write(stringBuilder.toString().getBytes(StandardCharsets.US_ASCII));
+						os.close();
+						break;
+					case "POST":
+						String body = Util.readWholeInputStream(t.getRequestBody());
+						t.getResponseHeaders().add("Content-Type", "text/plain");
+						t.getResponseHeaders().add("Location", "http://" + t.getLocalAddress().getAddress().getHostAddress() + ":" + this.port + "/apps/YouTube/run");
+
+						t.sendResponseHeaders(201, 0);
+
+						t.getResponseBody().close();
+
+						String params = URLDecoder.decode(body, StandardCharsets.UTF_8.name());
+
+						this.piy.getPlayer().startPlayer(params);
+
+						this.youtubeState = State.RUNNING;
+						break;
+					case "DELETE":
+						if (command != null && command.equals("run"))
+						{
+							this.piy.getPlayer().stopPlayer();
+
+							this.youtubeState = State.STOPPED;
+							t.sendResponseHeaders(200, 0);
+						}
+						break;
 				}
 			}
 		}

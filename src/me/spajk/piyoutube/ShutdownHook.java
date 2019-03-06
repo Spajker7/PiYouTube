@@ -11,6 +11,7 @@ public class ShutdownHook extends Thread
 	
 	public void run()
 	{
+		/*
 		if(this.piy.getChromeDriver() != null)
 		{
 			try
@@ -19,6 +20,7 @@ public class ShutdownHook extends Thread
 			}
 			catch(Exception e) {}
 		}
+		*/
 		
 		if(this.piy.getDialServer() != null)
 		{
